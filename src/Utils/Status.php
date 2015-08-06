@@ -42,6 +42,7 @@ class Status
     public function retry()
     {
         $this->retry++;
+        $this->sleep = (1 << $this->retry) * 1000000 + rand(0, 1000000);
         return true;
     }
 
@@ -110,7 +111,7 @@ class Status
      */
     public function getSleep()
     {
-        return (1 << $this->retry) * 1000000 + rand(0, 1000000);
+        return $this->sleep;
     }
 
     /**

@@ -3,63 +3,73 @@
 namespace Eoko\ExponentialBackoff\Test;
 
 use Eoko\ExponentialBackoff\Utils\ExponentialBackoff;
-use Eoko\ExponentialBackoff\Utils\Status;
 use PHPUnit_Framework_TestCase;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventManager;
 
 class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
 {
-    public static function example($status)
+
+    private $count = 0;
+
+    public static function staticMethod($status)
     {
         return $status;
     }
 
+    private function getCallable()
+    {
+        return function ($status) {
+            return $status;
+        };
+    }
+
+    private function getCallableWithException()
+    {
+        return function ($status) {
+            if ($status->getRetry() < 1) {
+                throw new \Exception();
+            }
+            return $status;
+        };
+    }
+
+    public function getClass()
+    {
+        $method = new ExponentialBackoff();
+        $eventManager = new EventManager();
+
+        $callback = function (Event $e) {
+            $this->count++;
+        };
+
+        $eventManager->attach(ExponentialBackoff::EVENT_PRE_CALL, $callback);
+        $eventManager->attach(ExponentialBackoff::EVENT_POST_CALL, $callback);
+        $eventManager->attach(ExponentialBackoff::EVENT_EXCEPTION_CALL, $callback);
+        $eventManager->attach(ExponentialBackoff::EVENT_SLEEP_CALL, $callback);
+        $eventManager->attach(ExponentialBackoff::EVENT_RETRY_CALL, $callback);
+        $eventManager->attach(ExponentialBackoff::EVENT_END_CALL, $callback);
+
+        $method->setEventManager($eventManager);
+        return $method;
+    }
+
     public function testSuccessClosure()
     {
-        //        $method = new ExponentialBackoff();
-//        $eventManager = new EventManager();
-//
-//        $callback = function(Event $e) {
-//            ob_end_clean();
-//            echo $e->getParams()->__toString();
-//            ob_start();
-//        };
-//
-//        $eventManager->attach(ExponentialBackoff::EVENT_PRE_CALL, $callback);
-//        $eventManager->attach(ExponentialBackoff::EVENT_POST_CALL, $callback);
-//        $eventManager->attach(ExponentialBackoff::EVENT_POST_CALL, $callback);
-//
-//        $method->setEventManager($eventManager);
-//        $callable = function ($status) {
-//            return $status;
-//        };
-//
-//        $callable_with_params = function ($status) {
-//            return $status;
-//        };
-//
-//        $callable_with_params_and_one_exception = function ($status) {
-//            if ($status->getRetry() < 1) {
-//                throw new \Exception();
-//            }
-//            return $status;
-//        };
-//
-//        $this->assertInstanceOf('Eoko\ExponentialBackoff\Utils\Status', $method->exponentialBackoff($callable), __FUNCTION__, 5);
-//
-//        /** @var Status $result */
-//        $result = $method->exponentialBackoff($callable_with_params, __FUNCTION__, 5);
-//        $this->assertEquals(0, $result->getRetry());
-//        $this->assertTrue($result->getSleep() < (2 * 1000000));
-//
-//        $result = $method->exponentialBackoff($callable_with_params_and_one_exception, __FUNCTION__, 5);
-//        $this->assertEquals(1, $result->getRetry());
-//        $this->assertTrue($result->getSleep() > (2*1000000) && $result->getSleep() < (3*1000000));
-//
-//        $result = $method->exponentialBackoff([$this, 'example'], __FUNCTION__, 5);
-//        $this->assertEquals(0, $result->getRetry());
-//        $this->assertTrue($result->getSleep() < (2*1000000));
+        $test1 = $this->getClass()->exponentialBackoff($this->getCallable(), __FUNCTION__, 5);
+        $this->assertInstanceOf('Eoko\ExponentialBackoff\Utils\Status', $test1);
+        $this->assertTrue($test1->getSleep() == 0);
+
+        $test2 = $this->getClass()->exponentialBackoff($this->getCallableWithException(), __FUNCTION__, 5);
+        $this->assertEquals(1, $test2->getRetry());
+        $this->assertTrue($test2->getSleep() > (2 * 1000000) && $test2->getSleep() < (3 * 1000000));
+
+        $test3 = $this->getClass()->exponentialBackoff([$this, 'staticMethod'], __FUNCTION__, 5);
+        $this->assertEquals(0, $test3->getRetry());
+        $this->assertTrue($test3->getSleep() < (2 * 1000000));
+
+        // Check that event are all triggered
+        $this->assertEquals(10, $this->count);
     }
 
     /**
@@ -71,24 +81,16 @@ class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
             throw new \Exception();
         };
 
-        $eventManager = new EventManager();
+        $this->count = 0;
 
-        $callback = function (Event $e) {
-            ob_end_clean();
-            echo $e->getParams()->__toString();
-            ob_start();
-        };
+        try {
+            $this->getClass()->exponentialBackoff($callable_with_params_and_one_exception, __FUNCTION__, 2);
+        } catch (\Exception $e) {
+            // Check that event are all triggered
+            $this->assertEquals(9, $this->count);
 
-        $eventManager->attach(ExponentialBackoff::EVENT_PRE_CALL, $callback);
-        $eventManager->attach(ExponentialBackoff::EVENT_POST_CALL, $callback);
-        $eventManager->attach(ExponentialBackoff::EVENT_EXCEPTION_CALL, $callback);
-        $eventManager->attach(ExponentialBackoff::EVENT_SLEEP_CALL, $callback);
-        $eventManager->attach(ExponentialBackoff::EVENT_RETRY_CALL, $callback);
-        $eventManager->attach(ExponentialBackoff::EVENT_END_CALL, $callback);
-
-
-        $method = new ExponentialBackoff();
-        $method->setEventManager($eventManager);
-        $method->exponentialBackoff($callable_with_params_and_one_exception, __FUNCTION__, 2);
+            // re-throw for test
+            throw $e;
+        }
     }
 }

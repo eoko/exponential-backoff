@@ -8,7 +8,6 @@
 
 namespace Eoko\ExponentialBackoff\Utils;
 
-
 class Status
 {
     protected $start;
@@ -17,7 +16,7 @@ class Status
     protected $retry;
     protected $sleep;
 
-    function __construct($label = 'default', $maxRetry = 5)
+    public function __construct($label = 'default', $maxRetry = 5)
     {
         $this->reset($label, $maxRetry);
     }
@@ -46,18 +45,21 @@ class Status
         return true;
     }
 
-    public function sleep() {
+    public function sleep()
+    {
         usleep($this->getSleep());
     }
 
-    public function isLoop() {
+    public function isLoop()
+    {
         if ($this->retry < $this->maxRetry) {
             return true;
         }
         return false;
     }
 
-    public function stopLoop() {
+    public function stopLoop()
+    {
         $this->retry = $this->maxRetry + 1;
     }
 
@@ -133,7 +135,7 @@ class Status
         return $hours . ':' . sprintf('%02d', $minutes) . ':' . sprintf('%02d', $seconds);
     }
 
-    function __toString()
+    public function __toString()
     {
         $return = 'label : ' . $this->getLabel() . "\n";
         $return .= 'retry : ' . $this->getRetry() . '/' . $this->getMaxRetry() . "\n";
@@ -141,5 +143,4 @@ class Status
         $return .= 'duration : ' . $this->secondsToTime($this->getDuration()) . "\n";
         return $return;
     }
-
 }

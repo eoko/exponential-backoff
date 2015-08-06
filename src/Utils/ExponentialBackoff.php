@@ -42,19 +42,19 @@ class ExponentialBackoff implements EventManagerAwareInterface
                 $em->trigger(self::EVENT_POST_CALL, $this, $status);
                 return $result;
             } catch (Exception $e) {
-                $em->trigger(self::EVENT_EXCEPTION_CALL, $this, $status );
+                $em->trigger(self::EVENT_EXCEPTION_CALL, $this, $status);
                 $innerException = $e;
             }
 
-            if($status->isLoop()) {
-                $em->trigger(self::EVENT_RETRY_CALL, $this, $status );
+            if ($status->isLoop()) {
+                $em->trigger(self::EVENT_RETRY_CALL, $this, $status);
                 $status->retry();
-                $em->trigger(self::EVENT_SLEEP_CALL, $this, $status );
+                $em->trigger(self::EVENT_SLEEP_CALL, $this, $status);
                 $status->sleep();
             }
         } while ($status->isLoop());
 
-        $em->trigger(self::EVENT_SLEEP_CALL, $this, $status );
+        $em->trigger(self::EVENT_SLEEP_CALL, $this, $status);
         throw $innerException;
     }
 }

@@ -17,7 +17,7 @@ class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
 
     public function testSuccessClosure()
     {
-//        $method = new ExponentialBackoff();
+        //        $method = new ExponentialBackoff();
 //        $eventManager = new EventManager();
 //
 //        $callback = function(Event $e) {
@@ -60,7 +60,6 @@ class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
 //        $result = $method->exponentialBackoff([$this, 'example'], __FUNCTION__, 5);
 //        $this->assertEquals(0, $result->getRetry());
 //        $this->assertTrue($result->getSleep() < (2*1000000));
-
     }
 
     /**
@@ -74,7 +73,7 @@ class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
 
         $eventManager = new EventManager();
 
-        $callback = function(Event $e) {
+        $callback = function (Event $e) {
             ob_end_clean();
             echo $e->getParams()->__toString();
             ob_start();

@@ -3,6 +3,9 @@ exponential-backoff
 
 [![Build Status](https://travis-ci.org/eoko/exponential-backoff.svg?branch=master)](https://travis-ci.org/eoko/exponential-backoff)
 [![Code Climate](https://codeclimate.com/github/eoko/exponential-backoff/badges/gpa.svg)](https://codeclimate.com/github/eoko/exponential-backoff)
+[![Eoko Public Channel](http://slackin.eoko.fr/badge.svg)](http://slackin.eoko.fr/)
+
+<img src="">
 
 Overview
 --------

@@ -30,7 +30,7 @@ class ExponentialBackoff implements EventManagerAwareInterface
      * @return mixed Closure result
      * @throws Exception
      */
-    public function exponentialBackoff($closure, $label = 'default', $maxRetry = 5)
+    public function call($closure, $label = 'default', $maxRetry = 5)
     {
         $status = new Status($label, $maxRetry);
         $em = $this->getEventManager();

@@ -8,8 +8,7 @@ class Module
         return [
             'controllers' => [
                 'invokables' => [
-                    'Eoko\ExponentialBackoff' =>
-                        'Eoko\ExponentialBackoff\Utils\ExponentialBackoff',
+                    'Eoko\ExponentialBackoff' => 'Eoko\ExponentialBackoff\Utils\ExponentialBackoff',
                 ],
             ],
         ];

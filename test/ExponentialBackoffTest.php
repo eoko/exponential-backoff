@@ -56,15 +56,15 @@ class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
 
     public function testSuccessClosure()
     {
-        $test1 = $this->getClass()->exponentialBackoff($this->getCallable(), __FUNCTION__, 5);
+        $test1 = $this->getClass()->call($this->getCallable(), __FUNCTION__, 5);
         $this->assertInstanceOf('Eoko\ExponentialBackoff\Utils\Status', $test1);
         $this->assertTrue($test1->getSleep() == 0);
 
-        $test2 = $this->getClass()->exponentialBackoff($this->getCallableWithException(), __FUNCTION__, 5);
+        $test2 = $this->getClass()->call($this->getCallableWithException(), __FUNCTION__, 5);
         $this->assertEquals(1, $test2->getRetry());
         $this->assertTrue($test2->getSleep() > (2 * 1000000) && $test2->getSleep() < (3 * 1000000));
 
-        $test3 = $this->getClass()->exponentialBackoff([$this, 'staticMethod'], __FUNCTION__, 5);
+        $test3 = $this->getClass()->call([$this, 'staticMethod'], __FUNCTION__, 5);
         $this->assertEquals(0, $test3->getRetry());
         $this->assertTrue($test3->getSleep() < (2 * 1000000));
 
@@ -84,7 +84,7 @@ class ExponentialBackoffTest extends PHPUnit_Framework_TestCase
         $this->count = 0;
 
         try {
-            $this->getClass()->exponentialBackoff($callable_with_params_and_one_exception, __FUNCTION__, 2);
+            $this->getClass()->call($callable_with_params_and_one_exception, __FUNCTION__, 2);
         } catch (\Exception $e) {
             // Check that event are all triggered
             $this->assertEquals(9, $this->count);

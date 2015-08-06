@@ -38,12 +38,12 @@ class ExponentialBackoff
         throw $innerException;
     }
 
-    private function secondsToTime($s)
+    private function secondsToTime($seconds)
     {
-        $h = floor($s / 3600);
-        $s -= $h * 3600;
-        $m = floor($s / 60);
-        $s -= $m * 60;
-        return $h . ':' . sprintf('%02d', $m) . ':' . sprintf('%02d', $s);
+        $hours = floor($seconds / 3600);
+        $seconds -= $hours * 3600;
+        $minutes = floor($seconds / 60);
+        $seconds -= $minutes * 60;
+        return $hours . ':' . sprintf('%02d', $minutes) . ':' . sprintf('%02d', $seconds);
     }
 }

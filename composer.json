@@ -1,0 +1,40 @@
+{
+    "name": "eoko/exponential-backoff",
+    "description":"Exponential backoff",
+    "keywords":["ExponentialBackoff"],
+    "type":"library",
+    "license":"MIT",
+
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+
+    "authors":[
+        {
+            "name":"Romain DARY",
+            "email": "romain.dary@eoko.fr",
+            "homepage":"http://eoko.fr"
+        }
+    ],
+    "homepage": "https://github.com/eoko/exponential-backoff",
+    "require":{
+        "php": ">=5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Eoko\\ExponentialBackoff\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Eoko\\ExponentialBackoff\\Test\\": "test/"
+        }
+    },
+
+    "require-dev": {
+        "satooshi/php-coveralls": "0.6.*",
+        "fabpot/php-cs-fixer": "1.7.*",
+        "phpunit/phpunit": "^5.0@dev",
+        "mockery/mockery": "dev-master",
+        "zendframework/zend-servicemanager": "^2.5@dev"
+    }
+}

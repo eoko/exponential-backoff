@@ -46,6 +46,33 @@ Get Started
 
 @todo
 
+Events
+------
+    
+|      Event Const     |             Event Name              |               Description              |
+| -------------------- | ----------------------------------- | -------------------------------------- |
+| EVENT_PRE_CALL       | event.exponential-backoff.pre       | Triggered before anything              |
+| EVENT_POST_CALL      | event.exponential-backoff.post      | Triggered when jobs is done            |
+| EVENT_EXCEPTION_CALL | event.exponential-backoff.exception | Triggered when an exception is thrown  |
+| EVENT_SLEEP_CALL     | event.exponential-backoff.sleep     | Triggered when the function will sleep |
+| EVENT_RETRY_CALL     | event.exponential-backoff.retry     | Triggered when the funciton will retry |
+| EVENT_END_CALL       | event.exponential-backoff.end       | Triggered when there is no more retry  |
+
+The event list can be used as follow :
+
+    $callback = function(Event $e) {
+        ob_end_clean();
+        echo $e->getParams()->__toString();
+        ob_start();
+    };
+
+    $eventManager->attach(ExponentialBackoff::EVENT_PRE_CALL, $callback);
+    $eventManager->attach(ExponentialBackoff::EVENT_POST_CALL, $callback);
+    $eventManager->attach(ExponentialBackoff::EVENT_EXCEPTION_CALL, $callback);
+    $eventManager->attach(ExponentialBackoff::EVENT_SLEEP_CALL, $callback);
+    $eventManager->attach(ExponentialBackoff::EVENT_RETRY_CALL, $callback);
+    $eventManager->attach(ExponentialBackoff::EVENT_END_CALL, $callback);
+
 
 Credits
 -------

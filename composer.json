@@ -30,11 +30,15 @@
         }
     },
 
+    "require": {
+        "zendframework/zend-servicemanager": "^2.5@dev",
+        "zendframework/zend-eventmanager": "^2.5@dev"
+    },
+
     "require-dev": {
         "satooshi/php-coveralls": "0.6.*",
         "fabpot/php-cs-fixer": "1.7.*",
         "phpunit/phpunit": "^5.0@dev",
-        "mockery/mockery": "dev-master",
-        "zendframework/zend-servicemanager": "^2.5@dev"
+        "mockery/mockery": "dev-master"
     }
 }

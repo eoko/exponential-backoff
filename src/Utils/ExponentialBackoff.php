@@ -9,41 +9,52 @@
 namespace Eoko\ExponentialBackoff\Utils;
 
 use Exception;
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerAwareTrait;
 
-class ExponentialBackoff
+class ExponentialBackoff implements EventManagerAwareInterface
 {
+    const EVENT_PRE_CALL = 'event.exponential-backoff.pre';
+    const EVENT_POST_CALL = 'event.exponential-backoff.post';
+    const EVENT_EXCEPTION_CALL = 'event.exponential-backoff.exception';
+    const EVENT_SLEEP_CALL = 'event.exponential-backoff.sleep';
+    const EVENT_RETRY_CALL = 'event.exponential-backoff.retry';
+    const EVENT_END_CALL = 'event.exponential-backoff.end';
+
+    use EventManagerAwareTrait;
+
     /**
      * @param callable $closure number of retry and elapsed time passed as param
+     * @param string $label
      * @param int $maxRetry
      * @return mixed Closure result
      * @throws Exception
      */
-    public function exponentialBackoff($closure, $maxRetry = 5)
+    public function exponentialBackoff($closure, $label = 'default', $maxRetry = 5)
     {
-        $start = microtime(true);
-        $retry = 0;
+        $status = new Status($label, $maxRetry);
+        $em = $this->getEventManager();
 
         do {
-            $retry++;
             try {
-                $elapsedTime = microtime(true) - $start;
-                $duration = $this->secondsToTime($elapsedTime);
-                return $closure(($retry - 1), $duration);
+                $em->trigger(self::EVENT_PRE_CALL, $this, $status);
+                $result = $closure($status);
+                $em->trigger(self::EVENT_POST_CALL, $this, $status);
+                return $result;
             } catch (Exception $e) {
-                usleep((1 << $retry) * 1000000 + rand(0, 1000000));
+                $em->trigger(self::EVENT_EXCEPTION_CALL, $this, $status );
                 $innerException = $e;
             }
-        } while ($retry <= $maxRetry);
 
+            if($status->isLoop()) {
+                $em->trigger(self::EVENT_RETRY_CALL, $this, $status );
+                $status->retry();
+                $em->trigger(self::EVENT_SLEEP_CALL, $this, $status );
+                $status->sleep();
+            }
+        } while ($status->isLoop());
+
+        $em->trigger(self::EVENT_SLEEP_CALL, $this, $status );
         throw $innerException;
-    }
-
-    private function secondsToTime($seconds)
-    {
-        $hours = floor($seconds / 3600);
-        $seconds -= $hours * 3600;
-        $minutes = floor($seconds / 60);
-        $seconds -= $minutes * 60;
-        return $hours . ':' . sprintf('%02d', $minutes) . ':' . sprintf('%02d', $seconds);
     }
 }

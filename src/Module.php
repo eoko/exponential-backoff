@@ -5,7 +5,14 @@ class Module
 {
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return [
+            'controllers' => [
+                'invokables' => [
+                    'Eoko\ExponentialBackoff' =>
+                        'Eoko\ExponentialBackoff\Utils\ExponentialBackoff',
+                ],
+            ],
+        ];
     }
 
     public function getAutoloaderConfig()

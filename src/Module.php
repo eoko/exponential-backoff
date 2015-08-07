@@ -6,7 +6,7 @@ class Module
     public function getConfig()
     {
         return [
-            'controllers' => [
+            'service_manager' => [
                 'invokables' => [
                     'Eoko\ExponentialBackoff' => 'Eoko\ExponentialBackoff\Utils\ExponentialBackoff',
                 ],
@@ -19,7 +19,7 @@ class Module
         return [
             'Zend\Loader\StandardAutoloader' => [
                 'namespaces' => [
-                    __NAMESPACE__ => __DIR__ . '/src',
+                    __NAMESPACE__ => __DIR__,
                 ],
             ],
         ];

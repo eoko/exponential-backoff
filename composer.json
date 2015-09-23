@@ -32,7 +32,9 @@
 
     "require": {
         "zendframework/zend-servicemanager": "^2.5@dev",
-        "zendframework/zend-eventmanager": "^2.5@dev"
+        "zendframework/zend-eventmanager": "^2.5@dev",
+        "zendframework/zend-stdlib": "~2.5",
+        "doctrine/common": "~2.5"
     },
 
     "require-dev": {
